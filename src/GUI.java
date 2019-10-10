@@ -95,6 +95,8 @@ public abstract class GUI {
     
     public abstract void start() throws IOException, InterruptedException, ClassNotFoundException; // Will initiate the connection between client and server
     
+    protected abstract void initalizeCreds();
+    
     public static synchronized void printMessage(String message) {
     	String contents = log.getText();
     	log.setText(contents + "\n" + message);
