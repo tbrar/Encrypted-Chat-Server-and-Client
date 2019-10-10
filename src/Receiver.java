@@ -1,6 +1,4 @@
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.net.Socket;
 
@@ -8,9 +6,9 @@ public class Receiver implements Runnable{
 	Socket socket;
 	ObjectInputStream in;
 	AES aes;
-	public Receiver(Socket socket, ObjectInputStream in, AES aes) {
-		this.socket = socket;
-		this.in = in;
+	public Receiver(Connection connection, AES aes) {
+		this.socket = connection.getClientSocket();
+		this.in = connection.getIn();
 		this.aes = aes;
 	}
 	

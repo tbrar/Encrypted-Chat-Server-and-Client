@@ -1,29 +1,16 @@
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
-import java.math.BigInteger;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.UnknownHostException;
-import java.security.Key;
-import java.util.Arrays;
-import java.util.Base64;
-
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
@@ -34,17 +21,14 @@ public abstract class GUI {
 	static JTextArea log;
 	JScrollPane scroll;
     JButton button;
-    Thread mainThread;
-    Socket clientSocket;
     KeyExchange exchange;
-    ObjectInputStream in;
-    ObjectOutputStream out;
     AES aes;
+    Connection connection;
     
     public GUI() {
-    	mainThread = Thread.currentThread();
+    	connection = new Connection();
 		window = new JFrame();
-		window.setExtendedState(window.MAXIMIZED_BOTH);
+		window.setExtendedState(Frame.MAXIMIZED_BOTH);
 		textBox = new JTextArea();
 		textBox.setFont(textBox.getFont().deriveFont(18f));
 		log = new JTextArea();
@@ -86,12 +70,7 @@ public abstract class GUI {
 			public void actionPerformed(ActionEvent e) {
 				printMessage("You: Decrypted: " + textBox.getText());
 				printMessage("You: Encrypted: " + aes.encrypt(textBox.getText()));
-				try {
-					out.writeObject(aes.encrypt(textBox.getText()));
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+				connection.send(aes.encrypt(textBox.getText()));
 				textBox.setText("");
 			}
 		});
@@ -99,9 +78,9 @@ public abstract class GUI {
 		WindowAdapter adapter = new WindowAdapter() {
 	        @Override
 	        public void windowClosing(WindowEvent e) {
-	        	if(clientSocket != null) {
+	        	if(connection.getClientSocket() != null) {
 	        		try {
-						clientSocket.close();
+						connection.getClientSocket().close();
 					} catch (IOException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
