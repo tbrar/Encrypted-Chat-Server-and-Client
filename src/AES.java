@@ -12,6 +12,8 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import java.util.Base64;
+import java.util.Base64.Decoder;
+import java.util.Base64.Encoder;
 
 public class AES {
 	SecureRandom random = new SecureRandom();
@@ -82,7 +84,10 @@ public class AES {
 	
 	public String encrypt(String message) {
 		try {
-			return Base64.getEncoder().encodeToString(encryptCipher.doFinal(message.getBytes()));
+			Encoder base64Encoder = Base64.getEncoder();
+			byte[] unencodedEncrypted = encryptCipher.doFinal(message.getBytes());
+			String encrypted = base64Encoder.encodeToString(unencodedEncrypted);
+			return encrypted;
 		} catch (IllegalBlockSizeException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -95,7 +100,10 @@ public class AES {
 	
 	public String decrypt(String message) {
 		try {
-			return new String(decryptCipher.doFinal(Base64.getDecoder().decode(message)));
+			Decoder base64Decoder = Base64.getDecoder();
+			byte[] decoded = base64Decoder.decode(message);
+			byte[] decrypted = decryptCipher.doFinal(decoded);
+			return new String(decrypted);
 		} catch (IllegalBlockSizeException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
